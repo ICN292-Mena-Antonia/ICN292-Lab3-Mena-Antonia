@@ -1,0 +1,513 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ordenes",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "624e68ed-338b-4503-942e-e42d08f4820a",
+      "name": "Webhook",
+      "webhookId": "4de97b02-47fc-44ac-8b7b-bae2b5f2f6e1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.id_solicitud }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "f163d0fd-9f7d-4c5c-9eb9-3c4718b9f678"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "INVALIDO_CAMPO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7a2b9c15-a57b-42f7-8f43-a76eef4f16b6",
+                    "leftValue": "={{ $json.body.monto.toNumber() }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "INVALIDO_MONTO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e6def22f-7241-40e5-8d7d-4f709088a855",
+                    "leftValue": "={{ $json.body.dias_desde_compra.toNumber() }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "RECHAZO_PLAZO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1adbe1e9-df41-4e4f-9e82-bef45af7bd4a",
+                    "leftValue": "={{ $json.body.estado_producto }}",
+                    "rightValue": "danado_por_uso",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "RECHAZO_ESTADO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a6af52ae-8ef0-494d-9ef4-4ebfcc781c20",
+                    "leftValue": "={{ $json.body.monto.toNumber() }}",
+                    "rightValue": 50000,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "REVISION_MONTO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "25282c32-9caf-4bb7-ac6b-df9dadfeeb98",
+                    "leftValue": "={{ $json.body.estado_producto }}",
+                    "rightValue": "con_fallas",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "REVISION_FALLA"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "366c7743-e170-4f52-bdee-50851d828ee6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "60138ab4-a7ae-4032-9ba0-8c9e580a7284",
+              "name": "ruta",
+              "value": "DATOS_INVALIDOS",
+              "type": "string"
+            },
+            {
+              "id": "7faeeb44-9ac7-41eb-b078-f60a6a0b96ad",
+              "name": "motivo",
+              "value": "Falta ID o monto es menor o igual a cero",
+              "type": "string"
+            },
+            {
+              "id": "5fb7dafa-0d13-4a39-82de-ebab01d230f8",
+              "name": "U",
+              "value": 50000,
+              "type": "number"
+            },
+            {
+              "id": "210853c7-fb1e-441f-a864-cd88cae52125",
+              "name": "D",
+              "value": 7,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        560,
+        -144
+      ],
+      "id": "f98f4598-27aa-43ea-9cce-c2f51bf27873",
+      "name": "Marcar Inválidos"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f6b9c91-24d7-4551-bdd5-7b4bdd516e3e",
+              "name": "ruta",
+              "value": "RECHAZO",
+              "type": "string"
+            },
+            {
+              "id": "79ba6b5c-2d8e-4bc4-aeec-c3542746c69f",
+              "name": "motivo",
+              "value": "Fuera de plazo o dañado por uso",
+              "type": "string"
+            },
+            {
+              "id": "bced6db8-2fc5-40a0-9258-cbfe65d2dbb1",
+              "name": "U",
+              "value": 50000,
+              "type": "number"
+            },
+            {
+              "id": "ff1d0cf6-def8-41d1-b717-409b20247d82",
+              "name": "D",
+              "value": 7,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        592,
+        16
+      ],
+      "id": "f3ebce39-a2ac-4055-b5da-597984e925bc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aac4706c-bcf3-4651-9643-a5f47b70a2a0",
+              "name": "ruta",
+              "value": "REVISION",
+              "type": "string"
+            },
+            {
+              "id": "dbe6def5-e8a1-4329-9002-f7e7b5af90ae",
+              "name": "motivo",
+              "value": "Monto excede umbral o con fallas",
+              "type": "string"
+            },
+            {
+              "id": "76becee9-ad17-4c77-bce5-bc988fedf950",
+              "name": "U",
+              "value": 50000,
+              "type": "number"
+            },
+            {
+              "id": "473d65d0-4384-46ac-bb22-aa8e63fd4721",
+              "name": "D",
+              "value": 7,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        608,
+        176
+      ],
+      "id": "f18abfcc-2c79-4ff8-a578-14dfc604d6c5",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "442239ef-e0cb-462e-a60d-c58280814404",
+              "name": "ruta",
+              "value": "APROBACION",
+              "type": "string"
+            },
+            {
+              "id": "e3b025c1-4466-44b3-87d6-0f02792a1084",
+              "name": "motivo",
+              "value": "Cumple todas las políticas",
+              "type": "string"
+            },
+            {
+              "id": "07fad1c5-0058-459a-8488-c2edfe440e0d",
+              "name": "U",
+              "value": 50000,
+              "type": "number"
+            },
+            {
+              "id": "88132e4a-a70c-43a1-af9a-6b0c5f527cc0",
+              "name": "D",
+              "value": 7,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        592,
+        336
+      ],
+      "id": "93ea5e53-dc89-4046-8dcb-53459032406f",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "url": "https://mindicador.cl/api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        944,
+        48
+      ],
+      "id": "616afb60-19c8-4dd3-96e7-23387b62906b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"mensaje\": \"Solicitud procesada con exito\",\n  \"valor_uf_hoy\": \"{{ $json.uf.valor }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1168,
+        48
+      ],
+      "id": "44ffe51e-594a-43d9-960f-2793b56bd08c",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData":{},  
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Marcar Inválidos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Marcar Inválidos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar Inválidos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5b996248-dc0d-4e02-b784-e12c2d26d5d0",
+  "meta": {
+    "instanceId": "96e6163ec5f2187ef54043f1c6ed23bbf0c2b73075903c7c4a49ad301249d29f"
+  },
+  "nodeGroups": [],
+  "id": "S6Oa3rXHfQaR2ms7",
+  "tags": []
+}
