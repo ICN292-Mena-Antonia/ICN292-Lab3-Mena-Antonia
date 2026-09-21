@@ -1,0 +1,123 @@
+{
+  "name": "ICN292-Lab3-Mena-Antonia-resumen",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 23
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "098d7e0f-e8f8-427f-bc59-9aede1b2aabd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "id"
+            },
+            {
+              "aggregation": "sum",
+              "field": "monto"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "ruta",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "4ba24038-5239-48c3-be00-365be9f6d8c8",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { id: \"DEV-01\", monto: 15000, ruta: \"Aprobacion_Automatica\" } },\n  { json: { id: \"DEV-02\", monto: 25000, ruta: \"Revision_Manual\" } },\n  { json: { id: \"DEV-03\", monto: 10000, ruta: \"Aprobacion_Automatica\" } },\n  { json: { id: \"DEV-04\", monto: 5000, ruta: \"Rechazo_Plazo\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "b01ef506-d110-402d-b44f-5ef114de8a56",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "let total_dia = 0;\nlet total_solicitudes = 0;\nlet aprobadas = 0;\nlet reporte = \" RESUMEN DIARIO DE SOLICITUDES\\n\\n\";\n\n// 1. Recorremos tu tabla para sumar y armar el texto por ruta\nfor (const item of $input.all()) {\n  let ruta = item.json.ruta;\n  let cantidad = item.json.count_id;\n  let monto = item.json.sum_monto;\n\n  total_dia += monto;\n  total_solicitudes += cantidad;\n\n  if (ruta === \"Aprobacion_Automatica\") {\n    aprobadas += cantidad;\n  }\n\n  reporte += `- Ruta ${ruta}: ${cantidad} solicitudes ($${monto})\\n`;\n}\n\n// 2. Calculamos la tasa (fórmula matemática simple)\nlet tasa = (aprobadas / total_solicitudes) * 100;\n\n// 3. Agregamos los totales globales al mensaje\nreporte += `\\n MONTO TOTAL DEL DÍA: $${total_dia}`;\nreporte += `\\n TASA DE APROBACIÓN AUTOMÁTICA: ${tasa}%`;\n\n// 4. Entregamos el paquete final\nreturn { json: { mensaje_final: reporte } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "57974a10-5845-4805-9bab-ba242071a56b",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "89992ebe-76c2-4a4d-949a-7287b5c2018c",
+  "meta": {
+    "instanceId": "96e6163ec5f2187ef54043f1c6ed23bbf0c2b73075903c7c4a49ad301249d29f"
+  },
+  "nodeGroups": [],
+  "id": "4YJLxwBtdVnE68Nw",
+  "tags": []
+}
